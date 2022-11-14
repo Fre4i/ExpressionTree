@@ -53,16 +53,15 @@ public:
 	}
 };
 
-/// <summary>
-/// Перечисление возможных операций
-/// </summary>
-
 //string lexStr(string str, int &pos) {
 //	while (pos < str.length()) {
 //		if 
 //	}
 //}
 
+/// <summary>
+/// Перечисление возможных операций
+/// </summary>
 
 enum Signs {
 	DIV, MUL, 
@@ -70,17 +69,17 @@ enum Signs {
 	LEFT_BRACKET, RIGHT_BRACKET,
 };
 
-map <Signs, char> mp = {
-	{LEFT_BRACKET, '('},
-	{RIGHT_BRACKET, ')'},
-	{DIV, '/'},
-	{MUL, '*'},
-	{MIN, '-'},
-	{PLUS, '+'},
+map <Signs, string> mp = {
+	{LEFT_BRACKET, "("},
+	{RIGHT_BRACKET, ")"},
+	{DIV, "/"},
+	{MUL, "*"},
+	{MIN, "-"},
+	{PLUS, "+"},
 };
-// обратная польская аннотация
-string reversePolishNotaion(string exp) {
-	string res = "";
+// обратная польская запись
+vector<string> reversePolishNotaion(string exp) {
+	vector<string> res;
 	stack<Signs> stk; // в стеке храним только знаки операций и скобки
 
 	int i = 0;
@@ -88,15 +87,17 @@ string reversePolishNotaion(string exp) {
 		switch (exp[i]) {
 			case '(':
 				stk.push(LEFT_BRACKET);
+				i++;
 				break;
 			case ')':
 				// уничтажаем обе скобки
 				while (stk.top() != LEFT_BRACKET) {
 					if (stk.top() != LEFT_BRACKET || stk.top() != RIGHT_BRACKET) {
-						res += mp[stk.top()];
+						res.push_back(mp[stk.top()]);
 					}
 					stk.pop();
 				}
+				i++;
 				stk.pop();
 				break;
 			case '/':
@@ -104,40 +105,53 @@ string reversePolishNotaion(string exp) {
 					stk.push(DIV);
 				}
 				else {
-					res += mp[stk.top()];
+					res.push_back(mp[stk.top()]);
 				}
+				i++;
 				break;
 			case '*':
 				if (stk.empty() || stk.top() > MUL) {
 					stk.push(MUL);
 				}
 				else {
-					res += mp[stk.top()];
+					res.push_back(mp[stk.top()]);
 				}
+				i++;
 				break;
 			case '-':
 				if (stk.empty() || stk.top() > PLUS) {
 					stk.push(MIN);
 				} else {
-					res += mp[stk.top()];
+					res.push_back(mp[stk.top()]);
 				}
+				i++;
 				break;
 			case '+':
 				if (stk.empty() || stk.top() > PLUS) {
 					stk.push(PLUS);
 				} else {
-					res += mp[stk.top()];
+					res.push_back(mp[stk.top()]);
 				}
+				i++;
 				break;
 			default:
-				res += exp[i];
+				string t = "";
+
+				do {
+					t += exp[i];
+					i++;
+					if (i >= exp.length())
+						break;
+				} while (exp[i] >= 'a' && exp[i] <= 'z' || exp[i] >= '0' && exp[i] <= '9');
+
+				res.push_back(t);
+
 		}
-		i++;
 	}
 
 	// если стек не пуст, извлекаем из него все операции
 	while (!stk.empty()) {
-		res += mp[stk.top()];
+		res.push_back(mp[stk.top()]);
 		stk.pop();
 	}
 
@@ -148,8 +162,26 @@ int main()	{
 
 	string exp1 = "a+(b-c)*d";
 	string exp2 = "a+b*c";
-	cout << reversePolishNotaion(exp1) << '\n';
-	cout << reversePolishNotaion(exp2) << '\n';
+	string exp3 = "21+2*3";
+
+	vector<string> vec1 = reversePolishNotaion(exp1);
+	for (auto el : vec1) {
+		cout << el << ' ';
+	}
+
+	cout << '\n';
+
+	vector<string> vec2 = reversePolishNotaion(exp2);
+	for (auto el : vec2) {
+		cout << el << ' ';
+	}
+
+	cout << '\n';
+
+	vector<string> vec3 = reversePolishNotaion(exp3);
+	for (auto el : vec3) {
+		cout << el << ' ';
+	}
 
     return 0;
 }
