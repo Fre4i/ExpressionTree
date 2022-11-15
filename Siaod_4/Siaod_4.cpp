@@ -2,62 +2,10 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <algorithm>
 #include <map>
 
 using namespace std;
-
-struct Node {
-	int key;
-	Node* left;
-	Node* right;
-};
-
-class tree {
-	Node* root; // корень
-
-public:
-	tree() {
-		root = NULL;
-	}
-	void printTree(Node** p) {
-		if (*p != NULL) {
-			printTree(&((**p).right), 1);
-			cout << (**p).key << '\n';
-			printTree(&((**p).left), 1);
-		}
-	}
-	void printTree(Node** p, int n) {
-		if (*p != NULL) {
-			printTree(&((**p).right), n);
-			cout << (**p).key << '\n';
-			printTree(&((**p).left), n);
-		}
-	}
-	Node** getRoot() { return &root; }
-	void Tree(int n, Node** p) {
-		Node* now;
-		int x, nl, nr;
-		now = *p;
-		if (n == 0) {
-			*p = NULL;
-		} else {
-			nl = n / 2; 
-			nr = n - nl - 1;
-			cin >> x;
-			now = new(Node);
-			(*now).key = x;
-			Tree(nl, &((*now).left));
-			Tree(nr, &((*now).right));
-			*p = now;
-		}
-	}
-};
-
-//string lexStr(string str, int &pos) {
-//	while (pos < str.length()) {
-//		if 
-//	}
-//}
 
 /// <summary>
 /// Перечисление возможных операций
@@ -158,6 +106,45 @@ vector<string> reversePolishNotaion(string exp) {
 	return res;
 }
 
+/// <summary>
+/// Преобразование в древовидную 
+/// </summary>
+
+class Node {
+	string val;
+	Node *left, *right;
+
+public:
+	Node(string val) { this->val = val; }
+	static Node parseUpn(vector<string> vec) {
+		vector<string> signs = {
+			"*", "/", "+", "-"
+		};
+
+		stack<Node> stk;
+
+		for (auto el : vec) {
+			Node *node = new Node(el);
+			auto it = find(signs.begin(), signs.end(), el);
+			if (it != signs.end()) {
+				node->right = &stk.top();
+				stk.pop();
+				node->left = &stk.top();	
+				stk.pop();
+			}
+			stk.push(*node);
+		}
+		auto res = stk.top();
+		stk.pop();
+		return res;
+	}
+	string toString() {
+		return this->left ? this->val : this->left->toString() + ' ' + this->val + ' ' + this->right->toString();
+	}
+};
+
+
+
 int main()	{
 
 	string exp1 = "a+(b-c)*d";
@@ -182,6 +169,8 @@ int main()	{
 	for (auto el : vec3) {
 		cout << el << ' ';
 	}
+
+	cout << Node::parseUpn(vec2).toString() << endl;
 
     return 0;
 }
