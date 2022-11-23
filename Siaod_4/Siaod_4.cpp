@@ -110,37 +110,78 @@ vector<string> reversePolishNotaion(string exp) {
 /// Преобразование в древовидную 
 /// </summary>
 
+auto counter = 0;
+
 class Node {
+public:
 	string val;
 	Node *left, *right;
 
 public:
 	Node(string val) { this->val = val; }
-	static Node parseUpn(vector<string> vec) {
+	static Node* parseUpn(vector<string> vec) {
 		vector<string> signs = {
 			"*", "/", "+", "-"
 		};
 
-		stack<Node> stk;
+		stack<Node*> stk;
 
 		for (auto el : vec) {
 			Node *node = new Node(el);
 			auto it = find(signs.begin(), signs.end(), el);
 			if (it != signs.end()) {
-				node->right = &stk.top();
+				node->right = stk.top();
 				stk.pop();
-				node->left = &stk.top();	
+				node->left = stk.top();	
 				stk.pop();
+				//cout << node->left->val + ' ' + node->val + ' ' + node->right->val;
 			}
-			stk.push(*node);
+			stk.push(node);
 		}
 		auto res = stk.top();
 		stk.pop();
 		return res;
 	}
-	string toString() {
-		return this->left ? this->val : this->left->toString() + ' ' + this->val + ' ' + this->right->toString();
+
+	void print(Node* abranch, int counter) {
+		 if (!abranch) return; //Если ветки не существует выходим
+		 counter+=5;//считаем отступы
+		 print(abranch->left, counter);
+		 for (int i = 0; i < counter; i++)
+		 {
+		 cout << " ";
+		 }
+		 cout << abranch->val << endl;
+		 print(abranch->right, counter);
+		 counter = counter - 5;
+		 return;
+		}
+	
+	int getHeight() {
+		int count = 1;
+		while (this->left)
+			count++;
+
+		return count;
 	}
+
+	//void print(Node *node, int counter) {
+	//		if (!node) return; //Если ветки не существует выходим
+	//		counter -= 5;//считаем отступы
+	//		print(node->left, counter);
+	//		counter -= 5;
+	//		for (int i = 0; i < counter; i++)
+	//		{
+	//			cout << " ";
+	//		}
+	//		cout << node->val << endl;
+	//		if (node->right)
+	//		{
+	//			counter += 5;
+	//		}
+	//		print(node->right, counter);
+	//		return;
+	//	}
 };
 
 
@@ -170,7 +211,12 @@ int main()	{
 		cout << el << ' ';
 	}
 
-	cout << Node::parseUpn(vec2).toString() << endl;
+	cout << '\n';
 
+
+	auto nd = Node::parseUpn(vec1);
+	cout << nd->getHeight() << endl;
+	//nd->print(nd, nd->getHeight() + 5);
+	nd->print(nd, nd->getHeight() + 5);
     return 0;
 }
